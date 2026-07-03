@@ -24,11 +24,13 @@ def parse_args():
     parser.add_argument("--side", required=True, choices=["BUY", "SELL", "buy", "sell"],
                          help="Order side: BUY or SELL")
     parser.add_argument("--type", dest="order_type", required=True,
-                         choices=["MARKET", "LIMIT", "market", "limit"],
-                         help="Order type: MARKET or LIMIT")
+                         choices=["MARKET", "LIMIT", "STOP", "market", "limit", "stop"],
+                         help="Order type: MARKET, LIMIT, or STOP")
     parser.add_argument("--quantity", required=True, type=float, help="Order quantity")
     parser.add_argument("--price", required=False, type=float, default=None,
-                         help="Price (required for LIMIT orders)")
+                         help="Price (required for LIMIT and STOP orders)")
+    parser.add_argument("--stop-price", dest="stop_price", required=False, type=float, default=None,
+                         help="Stop trigger price (required for STOP orders)")
 
     return parser.parse_args()
 
@@ -44,6 +46,8 @@ def print_summary(result: dict):
     print(f"  Quantity : {req['quantity']}")
     if req["price"] is not None:
         print(f"  Price    : {req['price']}")
+    if req.get("stop_price") is not None:
+        print(f"  Stop Price : {req['stop_price']}") 
 
     print("\n--- Order Response Details ---")
     print(f"  Order ID     : {summary['orderId']}")
@@ -75,6 +79,7 @@ def main():
             order_type=args.order_type,
             quantity=args.quantity,
             price=args.price,
+            stop_price=args.stop_price,
         )
         print_summary(result)
 

@@ -13,6 +13,7 @@ error handling.
 - Structured codebase: separate client (API) layer, order logic layer, and CLI layer
 - Logging of every API request, response, and error to a timestamped log file
 - Robust exception handling for invalid input, API errors, and network failures
+- **Bonus:** Support for **STOP** (stop-limit) orders — a third order type in addition to MARKET and LIMIT
 
 ## Project Structure
 
@@ -61,6 +62,12 @@ python cli.py --symbol BTCUSDT --side BUY --type MARKET --quantity 0.01
 python cli.py --symbol BTCUSDT --side SELL --type LIMIT --quantity 0.01 --price 65000
 ```
 
+### Place a STOP order
+
+```bash
+python cli.py --symbol BTCUSDT --side SELL --type STOP --quantity 0.01 --price 60000 --stop-price 60500
+```
+
 ### CLI Arguments
 
 | Argument      | Required          | Description                              |
@@ -70,6 +77,7 @@ python cli.py --symbol BTCUSDT --side SELL --type LIMIT --quantity 0.01 --price 
 | `--type`      | Yes                | `MARKET` or `LIMIT`                      |
 | `--quantity`  | Yes                | Order quantity (must be > 0)             |
 | `--price`     | Only for `LIMIT`   | Limit price (must be > 0)                |
+| `--stop-price`| Only for `STOP`   | Stop trigger price (must be > 0)          |
 
 ### Example Output
 --- Order Request Summary ---

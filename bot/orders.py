@@ -15,7 +15,7 @@ class OrderError(Exception):
 
 
 def place_order(client: BinanceFuturesTestnetClient, symbol: str, side: str,
-                 order_type: str, quantity, price=None) -> dict:
+                 order_type: str, quantity, price=None, stop_price=None) -> dict:
     """
     Validate input, place the order via the client, and return a clean summary.
 
@@ -26,7 +26,7 @@ def place_order(client: BinanceFuturesTestnetClient, symbol: str, side: str,
     """
     # Step 1: Validate input
     try:
-        clean_input = validate_order_input(symbol, side, order_type, quantity, price)
+        clean_input = validate_order_input(symbol, side, order_type, quantity, price, stop_price)
     except ValidationError as exc:
         logger.error(f"Validation failed: {exc}")
         raise OrderError(f"Invalid input: {exc}")
@@ -41,6 +41,7 @@ def place_order(client: BinanceFuturesTestnetClient, symbol: str, side: str,
             order_type=clean_input["order_type"],
             quantity=clean_input["quantity"],
             price=clean_input["price"],
+            stop_price=clean_input["stop_price"],
         )
     except BinanceClientError as exc:
         logger.error(f"Order placement failed: {exc}")
@@ -48,14 +49,14 @@ def place_order(client: BinanceFuturesTestnetClient, symbol: str, side: str,
 
     # Step 3: Build a clean summary for display
     summary = {
-        "orderId": response.get("orderId"),
+        "orderId": response.get("orderId") or response.get("algoId"),
         "symbol": response.get("symbol"),
-        "status": response.get("status"),
+        "status": response.get("status") or response.get("algoStatus"),
         "side": response.get("side"),
-        "type": response.get("type"),
-        "executedQty": response.get("executedQty"),
+        "type": response.get("type") or response.get("orderType"),
+        "executedQty": response.get("executedQty", "0.0000"),
         "avgPrice": response.get("avgPrice"),
-        "origQty": response.get("origQty"),
+        "origQty": response.get("origQty") or response.get("quantity"),
         "price": response.get("price"),
     }
 
